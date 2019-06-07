@@ -1,24 +1,42 @@
 class NegociacaoService {
     
-    obterNegociacoesDaSemana(cb){
+    constructor(){
 
-        let xhr = new XMLHttpRequest();
+        this._http = new HttpService();
+    }
+    obterNegociacoesDaSemana() {
 
-        xhr.open("GET", "negociacoes/semana");
+        return new Promise((resolve, reject) => {
 
-        xhr.onreadystatechange = () => {
+            this._http.get("negociacoes/semana")
+            .then(objetos => resolve(objetos.map(objeto => new Negociacao(new Date(objeto.data), objeto.quantidade, objeto.valor))))
+            .catch(erro => {console.log(erro);
+            reject("Não foi possível obter as negociações da semana.")
+            });
+        });
+    }
 
-            if(xhr.readyState == 4){
-                if(xhr.status == 200){
-                    console.log("Negociações obtidas com sucesso");
-                    cb(null, JSON.parse(xhr.responseText).map(objeto => new Negociacao(new Date(objeto.data), objeto.quantidade, objeto.valor)));
-                }else{
-                    cb("Não foi possível obter as negociações", null);
-                    console.log(xhr.responseText);
-                }
-            }
-        };
-    
-        xhr.send();
+    obterNegociacoesDaSemanaAnterior() {
+
+       return new Promise((resolve, reject) => {
+
+        this._http.get("negociacoes/anterior")
+        .then(objetos => resolve(objetos.map(objeto => new Negociacao(new Date(objeto.data), objeto.quantidade, objeto.valor))))
+        .catch(erro => {console.log(erro);
+        reject("Não foi possível obter as negociações da semana anterior.")
+        });
+       });
+    }
+
+    obterNegociacoesDaSemanaRetrasada() {
+
+        return new Promise((resolve, reject) => {
+
+            this._http.get("negociacoes/retrasada")
+            .then(objetos => resolve(objetos.map(objeto => new Negociacao(new Date(objeto.data), objeto.quantidade, objeto.valor))))
+            .catch(erro => {console.log(erro);
+            reject("Não foi possível obter as negociações da semana retrasada.")
+            });
+        });
     }
 }
