@@ -36,4 +36,18 @@ class NegociacaoService {
         throw new Error("Não foi possível obter as negociações da semana retrasada.")
         });
     }
+
+    obterNegociacoes(){
+
+        return Promise.all([
+            this.obterNegociacoesDaSemana(),
+            this.obterNegociacoesDaSemanaAnterior(),
+            this.obterNegociacoesDaSemanaRetrasada()
+            ])
+            .then(arrays => { 
+            return arrays.reduce((arrayAchatado, array) => arrayAchatado.concat(array), [])
+            })
+            .catch(erro => { throw new Error(erro)
+        });
+    }
 }
