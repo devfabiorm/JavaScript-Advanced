@@ -6,8 +6,8 @@ class DateHelper {
     }
 
     static textoParaData(texto) {
-        if (/^\d{4}-\d{2}-\d{d}$/.test(texto)) throw new Error ("Data no formato inválido");
-        return new Date(...texto.split('-').map((item, index) => item - index%2));
+        if (!/\d{2}\/\d{2}\/\d{4}$/.test(texto)) throw new Error ("Data no formato inválido");
+        return new Date(...texto.split('/').reverse().map((item, index) => item - index%2));
     }
 
     static dataParaTexto(data) {
