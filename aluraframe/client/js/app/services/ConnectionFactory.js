@@ -1,9 +1,10 @@
 var ConnectionFactory = (function(){
-    var version = 3;
-    var stores = ['negociacoes'];
-    var dbName = 'aluraframe';
+    const version = 3;
+    const stores = ['negociacoes'];
+    const dbName = 'aluraframe';
 
     var connection = null;
+    var close = null;
 
     return class ConnectionFactory{
         constructor() {
@@ -24,7 +25,13 @@ var ConnectionFactory = (function(){
                 
                 openRequest.onsuccess = e => {
                     
-                    if(!connection) connection = e.target.result;
+                    if(!connection) {
+                        connection = e.target.result;
+                        close = connection.close.bind(connection);
+                        connection.close = function(){
+                            throw new Error('Não é possível chamar o método close a partir da conexão');
+                        }
+                    }
                     resolve(connection);
                 }
                 
@@ -44,6 +51,12 @@ var ConnectionFactory = (function(){
         
                 e.target.result.createObjectStore(store);
             });
+        }
+
+        static close(){
+
+            close();
+            connection = null;
         }
     }
 })();
