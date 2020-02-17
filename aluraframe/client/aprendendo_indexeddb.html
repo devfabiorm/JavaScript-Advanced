@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aprendendo IndexedDb</title>
+</head>
+<body>
+    <script src="js/app/models/Negociacao.js"></script>
+    <script>
+        var openRequest = window.indexedDB.open('aluraframe', 3); //Nome do banco e a versão. A cadas upgrade a versão deve ser alterada.
+        var connection;
+
+        openRequest.onupgradeneeded = e => {
+
+            console.log('Cria ou altera um banco já existente'); //Mensagem aparece quando a janela é aberta e o banco ainda não exista e é criado ou quando o banco já existente é alterado
+            let myConnection = e.target.result;
+
+            if(myConnection.objectStoreNames.contains('negociacoes')){
+                myConnection.deleteObjectStore('negociacoes');
+            }
+
+            myConnection.createObjectStore('negociacoes', {autoIncrement: true}); //Cria uma "tabela" para armazenar os dados. Na verdade é um documento que armazena objetos.
+        };
+
+        openRequest.onsuccess = e => {
+
+            console.log('Conexão com o banco obtida com sucesso'); //Mensagem aparece toda vez que a janela for aberta e a conexão com o banco ocorrer com sucesso
+            connection = e.target.result;
+        };
+
+        openRequest.onerror = e => {
+
+            console.log(e.target.error); //Mensagem aparece quando a janela é aberta e ao tentar conectar com o banco acontece um erro
+        };
+
+        function adiciona(){
+
+            let transaction = connection.transaction(['negociacoes'], 'readwrite'); //Abre uma transação para gravação dos dados com a lista de nomes de objectStores que desejamos criar a transação em um array que ele deve procurar e qual o tipo de operação será realizada nessas objectStores
+
+            let store = transaction.objectStore('negociacoes'); //A partir da lista de nomes passadas na transação, é possível apontar qual objectStore será usada naquela operação em especifico
+
+            let negociacao = new Negociacao(new Date(), 1, 100);
+
+            let request = store.add(negociacao); //Com a transação apontada para o objectStore em específico é possível fazer a operação de inclusão, que na versão é uma requisição que pode devolver sucesso ou erro
+
+            request.onsuccess = e => { //retorno da requisição de adição com sucesso
+
+                console.log('Negociação incluída com sucesso');
+            };
+
+            request.onerror = e => { //retorno da requisição de adição com erro
+
+                console.log('Não foi possível incluir a negociação');
+            };
+        }
+
+        function listaTodos(){
+
+            let transaction = connection.transaction(['negociacoes'], 'readwrite'); //Abre uma transação para gravação dos dados com a lista de nome de objectStores em um array que ele deve procurar e qual o tipo de operação será realizada nessas objectStores
+
+            let store = transaction.objectStore('negociacoes'); //A partir da lista de nomes passadas na transação, é possível apontar qual objectStore será usada naquela operação em especifico
+
+            let cursor = store.openCursor(); //Abre o cursor que aponta para o primeiro item armazenado na store
+            
+            let negociacoes = [];
+
+            cursor.onsuccess = e =>{
+
+                let atual = e.target.result; //Pega o primeiro item para o qual ele está apontado, caso não exista nenhum item, o retorno será nulo
+
+                if(atual){ //se o retorno for diferente de nulo o bloco if será executado
+
+                    negociacoes.push(new Negociacao(atual.value._data, atual.value._quantidade, atual.value._valor));
+                    atual.continue(); //chama novamente o método onsuccess do cursor
+                }else{
+
+                    console.log(negociacoes);
+                }
+            };
+
+            cursor.onerror = e => {
+
+                console.log('Error: ' + e.target.error.name);
+            }
+        }
+    </script>
+</body>
+</html>
