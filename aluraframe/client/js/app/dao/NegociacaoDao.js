@@ -46,9 +46,7 @@ class NegociacaoDao{
           if(itemAtual){
 
             let dado = itemAtual.value;
-
             negociacoes.push(new Negociacao(new Date(dado._data), dado._quantidade, dado._valor));
-
             itemAtual.continue();
 
           }else{
@@ -62,6 +60,27 @@ class NegociacaoDao{
           console.log(e.target.error);
           reject('Não foi possível listar as negociações');
         };
+
+      });
+    }
+
+    apagaTodos(){
+
+      return new Promise((resolve, reject) => {
+
+        let request = this._connection
+                      .transaction([this._store], 'readwrite')
+                      .objectStore(this._store)
+                      .clear();
+
+        request.onsuccess = e => resolve('Negociações removidas com sucesso');
+
+        request.onerror = e => {
+
+          console.log(e.target.error);
+          reject('Erro ao remover as negociações');
+        }
+
       });
     }
 }
