@@ -13,12 +13,14 @@ class NegociacaoController {
         this._mensagemView = new MensagemView($("#mensagemView"));
         this._mensagem = new Bind(new Mensagem(), this._mensagemView, ['texto']);
 
+        this._service = new NegociacaoService();
+
         this._init();
     }
     
     _init(){
         
-        new NegociacaoService()
+        this._service
             .lista()
             .then(negociacoes => 
                 negociacoes.forEach(negociacao =>
@@ -37,7 +39,7 @@ class NegociacaoController {
 
         let negociacao = this._criaNegociacao();
 
-        new NegociacaoService()
+        this._service
             .cadastra(negociacao)
             .then(msg => {
 
@@ -50,7 +52,7 @@ class NegociacaoController {
 
     apaga() {
         
-        new NegociacaoService()
+        this._service
             .apaga()
             .then(msg => {
                 
@@ -62,19 +64,10 @@ class NegociacaoController {
 
     importaNegociacoes(){
 
-        let service = new NegociacaoService();
-
-       service.obterNegociacoes()
-       .then(negociacoes => 
-            negociacoes.filter(negociacao =>
-                    !this._listaNegociacoes.negociacoes.some(negociacaoExistente =>
-                        JSON.stringify(negociacao) == JSON.stringify(negociacaoExistente))))
-       .then(negociacoes => {
-                negociacoes.forEach(negociacao => this._listaNegociacoes.adiciona(negociacao));
-                    
-                this._mensagem.texto = "Negociações importadas com sucesso."
-            })
-       .catch(erro => this._mensagem.texto = erro);
+        this._service.importa(this._listaNegociacoes.negociacoes)
+            .then(negociacoes => 
+                negociacoes.forEach(negociacao => this._listaNegociacoes.adiciona(negociacao)))
+            .catch(erro => this._mensagem.texto = erro);
     }
 
     ordena(coluna) {

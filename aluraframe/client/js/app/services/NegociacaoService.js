@@ -75,6 +75,17 @@ class NegociacaoService {
             })
     }
 
+    importa(listaAtual){
+
+        return this.obterNegociacoes()
+            .then(negociacoes => negociacoes.filter(negociacao =>
+                !listaAtual.some(negociacaoExiste => 
+                    JSON.stringify(negociacaoExiste) == JSON.stringify(negociacao))))
+            .catch(erro => {
+                throw new Error(erro);
+            })
+    }
+
     apaga(){
 
         return ConnectionFactory.getConnection()
