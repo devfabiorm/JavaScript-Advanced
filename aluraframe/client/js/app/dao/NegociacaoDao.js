@@ -76,9 +76,7 @@ class NegociacaoDao{
         request.onsuccess = e => resolve('Negociações removidas com sucesso');
 
         request.onerror = e => {
-
-          console.log(e.target.error);
-          reject('Erro ao remover as negociações');
+          reject(e.target.error);
         }
 
       });

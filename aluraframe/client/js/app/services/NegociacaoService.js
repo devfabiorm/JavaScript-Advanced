@@ -50,4 +50,40 @@ class NegociacaoService {
             .catch(erro => { throw new Error(erro)
         });
     }
+
+    cadastra(negociacao){
+
+        return ConnectionFactory
+            .getConnection()
+            .then(conexao => new NegociacaoDao(conexao))
+            .then(dao => dao.adiciona(negociacao))
+            .then(() => 'Negociação cadastrada com sucesso')
+            .catch(() => {
+                throw new Error('Erro ao cadastrar negociacao')
+            });
+    }
+
+    lista(){
+
+        return ConnectionFactory
+            .getConnection()
+            .then(connection => new NegociacaoDao(connection))
+            .then(dao => dao.listaTodos())
+            .catch(erro => {
+                console.log(erro);
+                throw new Error('Erro ao obter as negociações do IndexDB');
+            })
+    }
+
+    apaga(){
+
+        return ConnectionFactory.getConnection()
+            .then(connection => new NegociacaoDao(connection))
+            .then(dao => dao.apagaTodos())
+            .then(msg => msg)
+            .catch(erro => {
+                console.log(erro);
+                throw new Error('Erro ao apagar negociações')
+            });
+    }
 }
