@@ -1,84 +1,91 @@
-class NegociacaoDao{
+'use strict';
 
-    constructor(connection){
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-        this._connection = connection;
-        this._store = 'negociacoes';
-    }
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-    adiciona(negociacao){
+var NegociacaoDao = function () {
+        function NegociacaoDao(connection) {
+                _classCallCheck(this, NegociacaoDao);
 
-      return new Promise((resolve, reject) => {
-
-        let request = this._connection
-                        .transaction([this._store], 'readwrite')
-                        .objectStore(this._store)
-                        .add(negociacao);
-                        
-        request.onsuccess = e => {
-
-            resolve('Negociacação cadastrada com sucesso');
+                this._connection = connection;
+                this._store = 'negociacoes';
         }
 
-        request.onerror = e => {
+        _createClass(NegociacaoDao, [{
+                key: 'adiciona',
+                value: function adiciona(negociacao) {
+                        var _this = this;
 
-            console.log(e.target.error);
-            reject('Erro ao gravar negociacão');
-        }
-      });
-    }
+                        return new Promise(function (resolve, reject) {
 
-    listaTodos(){
+                                var request = _this._connection.transaction([_this._store], 'readwrite').objectStore(_this._store).add(negociacao);
 
-      return new Promise((resolve, reject) => {
+                                request.onsuccess = function (e) {
 
-        let cursor = this._connection
-                      .transaction([this._store], 'readwrite')
-                      .objectStore(this._store)
-                      .openCursor();
-       
-        let negociacoes = [];
+                                        resolve('Negociacação cadastrada com sucesso');
+                                };
 
-        cursor.onsuccess = e => {
+                                request.onerror = function (e) {
 
-          let itemAtual = e.target.result;
+                                        console.log(e.target.error);
+                                        reject('Erro ao gravar negociacão');
+                                };
+                        });
+                }
+        }, {
+                key: 'listaTodos',
+                value: function listaTodos() {
+                        var _this2 = this;
 
-          if(itemAtual){
+                        return new Promise(function (resolve, reject) {
 
-            let dado = itemAtual.value;
-            negociacoes.push(new Negociacao(new Date(dado._data), dado._quantidade, dado._valor));
-            itemAtual.continue();
+                                var cursor = _this2._connection.transaction([_this2._store], 'readwrite').objectStore(_this2._store).openCursor();
 
-          }else{
-            
-            resolve(negociacoes);
-          }
-        };
+                                var negociacoes = [];
 
-        cursor.onerror = e => {
+                                cursor.onsuccess = function (e) {
 
-          console.log(e.target.error);
-          reject('Não foi possível listar as negociações');
-        };
+                                        var itemAtual = e.target.result;
 
-      });
-    }
+                                        if (itemAtual) {
 
-    apagaTodos(){
+                                                var dado = itemAtual.value;
+                                                negociacoes.push(new Negociacao(new Date(dado._data), dado._quantidade, dado._valor));
+                                                itemAtual.continue();
+                                        } else {
 
-      return new Promise((resolve, reject) => {
+                                                resolve(negociacoes);
+                                        }
+                                };
 
-        let request = this._connection
-                      .transaction([this._store], 'readwrite')
-                      .objectStore(this._store)
-                      .clear();
+                                cursor.onerror = function (e) {
 
-        request.onsuccess = e => resolve('Negociações removidas com sucesso');
+                                        console.log(e.target.error);
+                                        reject('Não foi possível listar as negociações');
+                                };
+                        });
+                }
+        }, {
+                key: 'apagaTodos',
+                value: function apagaTodos() {
+                        var _this3 = this;
 
-        request.onerror = e => {
-          reject(e.target.error);
-        }
+                        return new Promise(function (resolve, reject) {
 
-      });
-    }
-}
+                                var request = _this3._connection.transaction([_this3._store], 'readwrite').objectStore(_this3._store).clear();
+
+                                request.onsuccess = function (e) {
+                                        return resolve('Negociações removidas com sucesso');
+                                };
+
+                                request.onerror = function (e) {
+                                        reject(e.target.error);
+                                };
+                        });
+                }
+        }]);
+
+        return NegociacaoDao;
+}();
+//# sourceMappingURL=NegociacaoDao.js.map

@@ -41,8 +41,8 @@
             let form = $(".form");
             let negociacao = {
                 data: form.data.value,
-                quantidade: form.quantidade.value,
-                valor: form.valor.value
+                quantidade: parseInt(form.quantidade.value),
+                valor: parseFloat(form.valor.value)
             }
 
             //enviar o XMLHttpRequest
